@@ -2860,7 +2860,10 @@ olx.interaction.SelectOptions.prototype.wrapX;
  * @typedef {{
  *     features: (ol.Collection.<ol.Feature>|undefined),
  *     pixelTolerance: (number|undefined),
- *     source: (ol.source.Vector|undefined)
+ *     source: (ol.source.Vector|undefined),
+ *     snapToVertices: (boolean|undefined),
+ *     snapToEdges: (boolean|undefined),
+ *     snapToEndVerticesOnly: (boolean|undefined)
  * }}
  * @api
  */
@@ -2890,6 +2893,30 @@ olx.interaction.SnapOptions.prototype.pixelTolerance;
  * @api
  */
 olx.interaction.SnapOptions.prototype.source;
+
+
+/**
+ * Snap to Vertices. If true snaps to vertices
+ * @type {boolean|undefined}
+ * @api
+ */
+olx.interaction.SnapOptions.prototype.snapToVertices;
+
+
+/**
+ * Snap to Edges. If true snaps to edges
+ * @type {boolean|undefined}
+ * @api
+ */
+olx.interaction.SnapOptions.prototype.snapToEdges;
+
+
+/**
+ * Snap to End vertices only. If true snaps to end vertices of linestrings only
+ * @type {boolean|undefined}
+ * @api
+ */
+olx.interaction.SnapOptions.prototype.snapToEndVerticesOnly;
 
 
 /**

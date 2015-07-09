@@ -69,6 +69,31 @@ ol.interaction.Snap = function(opt_options) {
   this.features_ = goog.isDef(options.features) ? options.features : null;
 
   /**
+   * @type {boolean}
+   * @private
+   */
+  this.snapToVertices_ = goog.isDef(options.snapToVertices) ?
+      options.snapToVertices : true;
+
+  /**
+   * @type {boolean}
+   * @private
+   */
+  this.snapToEdges_ = goog.isDef(options.snapToEdges) ?
+      options.snapToEdges : true;
+
+  /**
+   * @type {boolean}
+   * @private
+   */
+  this.snapToEndVerticesOnly_ = goog.isDef(options.snapToEndVerticesOnly) ?
+      options.snapToEndVerticesOnly : false;
+  if (this.snapToEndVerticesOnly_) {
+    this.snapToVertices_ = true;
+    this.snapToEdges_ = false;
+  }
+
+  /**
    * @type {Array.<goog.events.Key>}
    * @private
    */
@@ -378,18 +403,42 @@ ol.interaction.Snap.prototype.snapTo = function(pixel, pixelCoordinate, map) {
     vertexPixel = map.getPixelFromCoordinate(vertex);
     if (Math.sqrt(ol.coordinate.squaredDistance(pixel, vertexPixel)) <=
         this.pixelTolerance_) {
-      snapped = true;
-      var pixel1 = map.getPixelFromCoordinate(closestSegment[0]);
-      var pixel2 = map.getPixelFromCoordinate(closestSegment[1]);
-      var squaredDist1 = ol.coordinate.squaredDistance(vertexPixel, pixel1);
-      var squaredDist2 = ol.coordinate.squaredDistance(vertexPixel, pixel2);
-      var dist = Math.sqrt(Math.min(squaredDist1, squaredDist2));
-      snappedToVertex = dist <= this.pixelTolerance_;
-      if (snappedToVertex) {
-        vertex = squaredDist1 > squaredDist2 ?
-            closestSegment[1] : closestSegment[0];
-        vertexPixel = map.getPixelFromCoordinate(vertex);
-        vertexPixel = [Math.round(vertexPixel[0]), Math.round(vertexPixel[1])];
+      if (this.snapToEdges_ && !this.snapToEndVerticesOnly_) {
+        snapped = true;
+      }
+      if (this.snapToVertices_) {
+        var pixel1 = map.getPixelFromCoordinate(closestSegment[0]);
+        var pixel2 = map.getPixelFromCoordinate(closestSegment[1]);
+        var squaredDist1 = ol.coordinate.squaredDistance(vertexPixel, pixel1);
+        var squaredDist2 = ol.coordinate.squaredDistance(vertexPixel, pixel2);
+        var dist = Math.sqrt(Math.min(squaredDist1, squaredDist2));
+        snappedToVertex = dist <= this.pixelTolerance_;
+        if (snappedToVertex) {
+          snapped = true;
+          vertex = squaredDist1 > squaredDist2 ?
+              closestSegment[1] : closestSegment[0];
+          vertexPixel = map.getPixelFromCoordinate(vertex);
+          vertexPixel = [Math.round(vertexPixel[0]),
+                Math.round(vertexPixel[1])];
+          if (this.snapToEndVerticesOnly_) {
+            snapped = false;
+            var geometry = segments[0].feature.getGeometry();
+            var geometryType = geometry.getType();
+            if (geometryType == 'LineString') {
+              var simpleGeometry =
+                  /** @type {ol.geom.SimpleGeometry} */ (geometry);
+              var firstCoordinate =
+                  simpleGeometry.getFirstCoordinate();
+              var lastCoordinate = simpleGeometry.getLastCoordinate();
+              if ((vertex[0] == firstCoordinate[0] &&
+                  vertex[1] == firstCoordinate[1]) ||
+                  (vertex[0] == lastCoordinate[0] &&
+                  vertex[1] == lastCoordinate[1])) {
+                snapped = true;
+              }
+            }
+          }
+        }
       }
     }
   }

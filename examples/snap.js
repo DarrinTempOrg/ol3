@@ -141,6 +141,8 @@ Modify.setActive(false);
 // in order for its map browser event handlers to be fired first. Its handlers
 // are responsible of doing the snapping.
 var snap = new ol.interaction.Snap({
-  source: vector.getSource()
+  source: vector.getSource(),
+  snapToVertices: true,
+  snapToEndVerticesOnly: false
 });
 map.addInteraction(snap);
