@@ -473,6 +473,7 @@ olx.ProjectionOptions.prototype.global;
  */
 olx.ProjectionOptions.prototype.worldExtent;
 
+
 /**
  * Function to determine resolution at a point. The function is called with a
  * `{number}` view resolution and an `{ol.Coordinate}` as arguments, and returns
@@ -911,6 +912,7 @@ olx.control.AttributionOptions.prototype.tipLabel;
  * @api
  */
 olx.control.AttributionOptions.prototype.label;
+
 
 /**
  * Text label to use for the expanded attributions button. Default is `»`.
@@ -2829,6 +2831,7 @@ olx.interaction.SelectOptions.prototype.removeCondition;
  */
 olx.interaction.SelectOptions.prototype.toggleCondition;
 
+
 /**
  * A boolean that determines if the default behaviour should select only
  * single features or all (overlapping) features at the clicked map
@@ -2837,6 +2840,7 @@ olx.interaction.SelectOptions.prototype.toggleCondition;
  * @api
  */
 olx.interaction.SelectOptions.prototype.multi;
+
 
 /**
  * A function that takes an {@link ol.Feature} and an {@link ol.layer.Layer} and
@@ -2880,7 +2884,7 @@ olx.interaction.SnapOptions.prototype.features;
 
 /**
  * Pixel tolerance for considering the pointer close enough to a segment or
- * vertex for editing. Default is `10` pixels.
+ * vertex for snapping. Default is `10` pixels.
  * @type {number|undefined}
  * @api
  */
@@ -4207,7 +4211,8 @@ olx.source.ImageMapGuideOptions.prototype.projection;
 
 /**
  * Ratio. `1` means image requests are the size of the map viewport, `2` means
- * twice the size of the map viewport, and so on. Default is `1`.
+ * twice the width and height of the map viewport, and so on. Must be `1` or 
+ * higher. Default is `1`.
  * @type {number|undefined}
  * @api stable
  */
@@ -4220,7 +4225,6 @@ olx.source.ImageMapGuideOptions.prototype.ratio;
  * @api stable
  */
 olx.source.ImageMapGuideOptions.prototype.resolutions;
-
 
 
 /**
@@ -4426,7 +4430,8 @@ olx.source.ImageCanvasOptions.prototype.projection;
 
 /**
  * Ratio. 1 means canvases are the size of the map viewport, 2 means twice the
- * size of the map viewport, and so on. Default is `1.5`.
+ * width and height of the map viewport, and so on. Must be `1` or higher.
+ * Default is `1.5`.
  * @type {number|undefined}
  * @api
  */
@@ -4489,7 +4494,8 @@ olx.source.ImageVectorOptions.prototype.projection;
 
 /**
  * Ratio. 1 means canvases are the size of the map viewport, 2 means twice the
- * size of the map viewport, and so on. Default is `1.5`.
+ * width and height of the map viewport, and so on. Must be `1` or higher. 
+ * Default is `1.5`.
  * @type {number|undefined}
  * @api
  */
@@ -4520,6 +4526,65 @@ olx.source.ImageVectorOptions.prototype.source;
  * @api
  */
 olx.source.ImageVectorOptions.prototype.style;
+
+
+/**
+ * @typedef {{sources: Array.<ol.source.Source>,
+ *     operation: (ol.raster.Operation|undefined),
+ *     lib: (Object|undefined),
+ *     threads: (number|undefined),
+ *     operationType: (ol.raster.OperationType|undefined)}}
+ * @api
+ */
+olx.source.RasterOptions;
+
+
+/**
+ * Input sources.
+ * @type {Array.<ol.source.Source>}
+ * @api
+ */
+olx.source.RasterOptions.prototype.sources;
+
+
+/**
+ * Raster operation.  The operation will be called with data from input sources
+ * and the output will be assigned to the raster source.
+ * @type {ol.raster.Operation|undefined}
+ * @api
+ */
+olx.source.RasterOptions.prototype.operation;
+
+
+/**
+ * Functions that will be made available to operations run in a worker.
+ * @type {Object|undefined}
+ * @api
+ */
+olx.source.RasterOptions.prototype.lib;
+
+
+/**
+ * By default, operations will be run in a single worker thread.  To avoid using
+ * workers altogether, set `threads: 0`.  For pixel operations, operations can
+ * be run in multiple worker threads.  Note that there is additional overhead in
+ * transferring data to multiple workers, and that depending on the user's
+ * system, it may not be possible to parallelize the work.
+ * @type {number|undefined}
+ * @api
+ */
+olx.source.RasterOptions.prototype.threads;
+
+
+/**
+ * Operation type.  Supported values are `'pixel'` and `'image'`.  By default,
+ * `'pixel'` operations are assumed, and operations will be called with an
+ * array of pixels from input sources.  If set to `'image'`, operations will
+ * be called with an array of ImageData objects from input sources.
+ * @type {ol.raster.OperationType|undefined}
+ * @api
+ */
+olx.source.RasterOptions.prototype.operationType;
 
 
 /**
@@ -4613,7 +4678,8 @@ olx.source.ImageWMSOptions.prototype.projection;
 
 /**
  * Ratio. `1` means image requests are the size of the map viewport, `2` means
- * twice the size of the map viewport, and so on. Default is `1.5`.
+ * twice the width and height of the map viewport, and so on. Must be `1` or 
+ * higher. Default is `1.5`.
  * @type {number|undefined}
  * @api stable
  */
@@ -4781,6 +4847,7 @@ olx.source.ImageStaticOptions.prototype.url;
 
 /**
  * @typedef {{attributions: (Array.<ol.Attribution>|undefined),
+ *     crossOrigin: (null|string|undefined),
  *     params: (Object.<string, *>|undefined),
  *     logo: (string|olx.LogoOptions|undefined),
  *     tileGrid: (ol.tilegrid.TileGrid|undefined),
@@ -4793,12 +4860,25 @@ olx.source.ImageStaticOptions.prototype.url;
  */
 olx.source.TileArcGISRestOptions;
 
+
 /**
  * Attributions.
  * @type {Array.<ol.Attribution>|undefined}
  * @api
  */
 olx.source.TileArcGISRestOptions.prototype.attributions;
+
+
+/**
+ * The `crossOrigin` attribute for loaded images.  Note that you must provide a
+ * `crossOrigin` value if you are using the WebGL renderer or if you want to
+ * access pixel data with the Canvas renderer.  See
+ * {@link https://developer.mozilla.org/en-US/docs/Web/HTML/CORS_enabled_image}
+ * for more detail.
+ * @type {null|string|undefined}
+ * @api
+ */
+olx.source.TileArcGISRestOptions.prototype.crossOrigin;
 
 
 /**
@@ -4833,6 +4913,7 @@ olx.source.TileArcGISRestOptions.prototype.logo;
  * @api
  */
 olx.source.TileArcGISRestOptions.prototype.tileGrid;
+
 
 /**
  * Projection.
@@ -5351,7 +5432,9 @@ olx.source.WMTSOptions.prototype.dimensions;
 
 /**
  * A URL for the service.  For the RESTful request encoding, this is a URL
- * template.  For KVP encoding, it is normal URL.
+ * template.  For KVP encoding, it is normal URL. A `{?-?}` template pattern,
+ * for example `subdomain{a-f}.domain.com`, may be used instead of defining
+ * each one separately in the `urls` option.
  * @type {string|undefined}
  * @api stable
  */
@@ -5508,6 +5591,8 @@ olx.source.XYZOptions.prototype.tileUrlFunction;
 
 /**
  * URL template. Must include `{x}`, `{y}` or `{-y}`, and `{z}` placeholders.
+ * A `{?-?}` template pattern, for example `subdomain{a-f}.domain.com`, may be
+ * used instead of defining each one separately in the `urls` option.
  * @type {string|undefined}
  * @api stable
  */
