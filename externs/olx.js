@@ -2505,6 +2505,22 @@ olx.interaction.DrawOptions.prototype.wrapX;
 
 
 /**
+ * @typedef {{features: (ol.Collection.<ol.Feature>|undefined)}}
+ * @api
+ */
+olx.interaction.TranslateOptions;
+
+
+/**
+ * Only features contained in this collection will be able to be translated. If
+ * not specified, all features on the map will be able to be translated.
+ * @type {ol.Collection.<ol.Feature>|undefined}
+ * @api
+ */
+olx.interaction.TranslateOptions.prototype.features;
+
+
+/**
  * @typedef {{condition: (ol.events.ConditionType|undefined),
  *     duration: (number|undefined),
  *     pixelDelta: (number|undefined)}}
@@ -2938,6 +2954,7 @@ olx.layer;
  *     saturation: (number|undefined),
  *     visible: (boolean|undefined),
  *     extent: (ol.Extent|undefined),
+ *     zIndex: (number|undefined),
  *     minResolution: (number|undefined),
  *     maxResolution: (number|undefined)}}
  * @api
@@ -3003,6 +3020,15 @@ olx.layer.BaseOptions.prototype.extent;
 
 
 /**
+ * The z-index for layer rendering.  At rendering time, the layers will be
+ * ordered, first by Z-index and then by position. The default Z-index is 0.
+ * @type {number|undefined}
+ * @api
+ */
+olx.layer.BaseOptions.prototype.zIndex;
+
+
+/**
  * The minimum resolution (inclusive) at which this layer will be visible.
  * @type {number|undefined}
  * @api stable
@@ -3027,6 +3053,7 @@ olx.layer.BaseOptions.prototype.maxResolution;
  *     source: (ol.source.Source|undefined),
  *     visible: (boolean|undefined),
  *     extent: (ol.Extent|undefined),
+ *     zIndex: (number|undefined),
  *     minResolution: (number|undefined),
  *     maxResolution: (number|undefined)}}
  * @api
@@ -3102,6 +3129,15 @@ olx.layer.LayerOptions.prototype.extent;
 
 
 /**
+ * The z-index for layer rendering.  At rendering time, the layers will be
+ * ordered, first by Z-index and then by position. The default Z-index is 0.
+ * @type {number|undefined}
+ * @api
+ */
+olx.layer.LayerOptions.prototype.zIndex;
+
+
+/**
  * The minimum resolution (inclusive) at which this layer will be visible.
  * @type {number|undefined}
  * @api stable
@@ -3125,6 +3161,7 @@ olx.layer.LayerOptions.prototype.maxResolution;
  *     saturation: (number|undefined),
  *     visible: (boolean|undefined),
  *     extent: (ol.Extent|undefined),
+ *     zIndex: (number|undefined),
  *     minResolution: (number|undefined),
  *     maxResolution: (number|undefined),
  *     layers: (Array.<ol.layer.Base>|ol.Collection.<ol.layer.Base>|undefined)}}
@@ -3188,6 +3225,15 @@ olx.layer.GroupOptions.prototype.visible;
  * @api stable
  */
 olx.layer.GroupOptions.prototype.extent;
+
+
+/**
+ * The z-index for layer rendering.  At rendering time, the layers will be
+ * ordered, first by Z-index and then by position. The default Z-index is 0.
+ * @type {number|undefined}
+ * @api
+ */
+olx.layer.GroupOptions.prototype.zIndex;
 
 
 /**
@@ -5176,7 +5222,7 @@ olx.source.TileWMSOptions.prototype.wrapX;
  *     loader: (ol.FeatureLoader|undefined),
  *     logo: (string|olx.LogoOptions|undefined),
  *     strategy: (ol.LoadingStrategy|undefined),
- *     url: (string|undefined),
+ *     url: (string|ol.FeatureUrlFunction|undefined),
  *     useSpatialIndex: (boolean|undefined),
  *     wrapX: (boolean|undefined)}}
  * @api
@@ -5239,10 +5285,12 @@ olx.source.VectorOptions.prototype.strategy;
 
 /**
  * Setting this option instructs the source to use an XHR loader (see
- * {@link ol.featureloader.xhr}) and an {@link ol.loadingstrategy.all} for a
- * one-off download of all features from that URL.
+ * {@link ol.featureloader.xhr}). Use a `string` and an
+ * {@link ol.loadingstrategy.all} for a one-off download of all features from
+ * the given URL. Use a {@link ol.FeatureUrlFunction} to generate the url with
+ * other loading strategies.
  * Requires `format` to be set as well.
- * @type {string|undefined}
+ * @type {string|ol.FeatureUrlFunction|undefined}
  * @api
  */
 olx.source.VectorOptions.prototype.url;

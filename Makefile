@@ -171,7 +171,7 @@ host-libraries: build/timestamps/node-modules-timestamp
 	@mkdir -p $(BUILD_HOSTED)/ol.ext
 	@cp -r build/ol.ext/* $(BUILD_HOSTED)/ol.ext/
 
-$(BUILD_EXAMPLES): $(EXAMPLES)
+$(BUILD_EXAMPLES): $(EXAMPLES) package.json
 	@mkdir -p $(@D)
 	@node tasks/build-examples.js
 
@@ -188,13 +188,13 @@ build/timestamps/check-%-timestamp: $(BUILD_HOSTED)/examples/%.html \
 
 build/timestamps/check-requires-timestamp: $(SRC_JS) $(EXAMPLES_JS) \
                                            $(SRC_SHADER_JS) $(SPEC_JS) \
-                                           $(SPEC_RENDERING JS)
+                                           $(SPEC_RENDERING_JS)
 	@mkdir -p $(@D)
 	@python bin/check-requires.py $(CLOSURE_LIB) $^
 	@touch $@
 
 build/timestamps/check-whitespace-timestamp: $(SRC_JS) $(EXAMPLES_JS) \
-                                             $(SPEC_JS) $(SPEC_RENDERING JS) \
+                                             $(SPEC_JS) $(SPEC_RENDERING_JS) \
                                              $(SRC_JSDOC)
 	@mkdir -p $(@D)
 	@python bin/check-whitespace.py $^
@@ -323,5 +323,5 @@ build/test_rendering_requires.js: $(SPEC_RENDERING_JS)
 	@mkdir -p $(@D)
 	@node tasks/generate-requires.js $^ > $@
 
-%shader.js: %.glsl src/ol/webgl/shader.mustache bin/pyglslunit.py
-	@python bin/pyglslunit.py --input $< --template src/ol/webgl/shader.mustache --output $@
+%shader.js: %.glsl src/ol/webgl/shader.mustache bin/pyglslunit.py build/timestamps/node-modules-timestamp
+	@python bin/pyglslunit.py --input $< | ./node_modules/.bin/mustache - src/ol/webgl/shader.mustache > $@

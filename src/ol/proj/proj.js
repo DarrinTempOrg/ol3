@@ -141,8 +141,12 @@ ol.proj.Projection = function(options) {
    */
   this.defaultTileGrid_ = null;
 
-  if (ol.ENABLE_PROJ4JS && typeof proj4 == 'function') {
-    var code = options.code;
+  var projections = ol.proj.projections_;
+  var code = options.code;
+  goog.asserts.assert(goog.isDef(code),
+      'Option "code" is required for constructing instance');
+  if (ol.ENABLE_PROJ4JS && typeof proj4 == 'function' &&
+      !goog.isDef(projections[code])) {
     var def = proj4.defs(code);
     if (goog.isDef(def)) {
       if (goog.isDef(def.axis) && !goog.isDef(options.axisOrientation)) {
@@ -158,7 +162,6 @@ ol.proj.Projection = function(options) {
         }
         this.units_ = units;
       }
-      var projections = ol.proj.projections_;
       var currentCode, currentDef, currentProj, proj4Transform;
       for (currentCode in projections) {
         currentDef = proj4.defs(currentCode);

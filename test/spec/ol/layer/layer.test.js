@@ -66,6 +66,7 @@ describe('ol.layer.Layer', function() {
         managed: true,
         sourceState: ol.source.State.READY,
         extent: undefined,
+        zIndex: 0,
         maxResolution: Infinity,
         minResolution: 0
       });
@@ -86,6 +87,7 @@ describe('ol.layer.Layer', function() {
         opacity: 0.5,
         saturation: 5,
         visible: false,
+        zIndex: 10,
         maxResolution: 500,
         minResolution: 0.25,
         foo: 42
@@ -111,6 +113,7 @@ describe('ol.layer.Layer', function() {
         managed: true,
         sourceState: ol.source.State.READY,
         extent: undefined,
+        zIndex: 10,
         maxResolution: 500,
         minResolution: 0.25
       });
@@ -194,6 +197,7 @@ describe('ol.layer.Layer', function() {
       layer.setVisible(false);
       layer.setMaxResolution(500);
       layer.setMinResolution(0.25);
+      layer.setZIndex(10);
       expect(layer.getLayerState()).to.eql({
         layer: layer,
         brightness: -0.7,
@@ -205,6 +209,7 @@ describe('ol.layer.Layer', function() {
         managed: true,
         sourceState: ol.source.State.READY,
         extent: undefined,
+        zIndex: 10,
         maxResolution: 500,
         minResolution: 0.25
       });
@@ -228,6 +233,7 @@ describe('ol.layer.Layer', function() {
         managed: true,
         sourceState: ol.source.State.READY,
         extent: undefined,
+        zIndex: 0,
         maxResolution: Infinity,
         minResolution: 0
       });
@@ -249,6 +255,7 @@ describe('ol.layer.Layer', function() {
         managed: true,
         sourceState: ol.source.State.READY,
         extent: undefined,
+        zIndex: 0,
         maxResolution: Infinity,
         minResolution: 0
       });
@@ -578,30 +585,55 @@ describe('ol.layer.Layer', function() {
 
   });
 
-  describe('As overlay', function() {
+  describe('#setMap (unmanaged layer)', function() {
+    var map;
 
-    it('overlays the layer on the map', function() {
-      var map = new ol.Map({});
-      var layer = new ol.layer.Layer({
-        map: map
+    beforeEach(function() {
+      map = new ol.Map({});
+    });
+
+    describe('with map in constructor options', function() {
+      it('renders the layer', function() {
+        var layer = new ol.layer.Layer({
+          map: map
+        });
+        var frameState = {
+          layerStatesArray: [],
+          layerStates: {}
+        };
+        map.dispatchEvent(new ol.render.Event('precompose', map, null,
+            frameState, null, null));
+        expect(frameState.layerStatesArray.length).to.be(1);
+        var layerState = frameState.layerStatesArray[0];
+        expect(layerState.layer).to.equal(layer);
+        expect(frameState.layerStates[goog.getUid(layer)]).to.equal(layerState);
       });
-      var frameState = {
-        layerStatesArray: [],
-        layerStates: {}
-      };
-      map.dispatchEvent(new ol.render.Event('precompose', map, null,
-          frameState, null, null));
-      expect(frameState.layerStatesArray.length).to.be(1);
-      var layerState = frameState.layerStatesArray[0];
-      expect(layerState.layer).to.equal(layer);
-      expect(frameState.layerStates[goog.getUid(layer)]).to.equal(layerState);
-      frameState.layerStatesArray = [];
-      frameState.layerStates = {};
+    });
 
-      layer.setMap(null);
-      map.dispatchEvent(new ol.render.Event('precompose', map, null,
-          frameState, null, null));
-      expect(frameState.layerStatesArray.length).to.be(0);
+    describe('setMap sequences', function() {
+      var mapRenderSpy;
+
+      beforeEach(function() {
+        mapRenderSpy = sinon.spy(map, 'render');
+      });
+
+      afterEach(function() {
+        mapRenderSpy.restore();
+      });
+
+      it('requests a render frame', function() {
+        var layer = new ol.layer.Layer({});
+
+        layer.setMap(map);
+        expect(mapRenderSpy.callCount).to.be(1);
+
+        layer.setMap(null);
+        expect(mapRenderSpy.callCount).to.be(2);
+
+        layer.setMap(map);
+        expect(mapRenderSpy.callCount).to.be(3);
+      });
+
     });
 
   });
