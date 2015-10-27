@@ -1,7 +1,7 @@
 goog.provide('ol.interaction.Modify');
 goog.provide('ol.interaction.ModifyEvent');
 
-goog.require('goog.array');
+//goog.require('goog.array');
 goog.require('goog.asserts');
 goog.require('goog.events');
 goog.require('goog.events.Event');
@@ -962,6 +962,14 @@ ol.interaction.Modify.prototype.setGeometryCoordinates_ =
   this.changingFeature_ = false;
 };
 
+/**
+ * Get the draw overlay where sketch features are drawn.
+ * @return {ol.layer.Vector} drawing overlay
+ * @api
+ */
+ol.interaction.Modify.prototype.getOverlay = function() {
+  return this.overlay_;
+};
 
 /**
  * @param {ol.geom.SimpleGeometry} geometry Geometry.
@@ -973,10 +981,10 @@ ol.interaction.Modify.prototype.setGeometryCoordinates_ =
 ol.interaction.Modify.prototype.updateSegmentIndices_ = function(
     geometry, index, depth, delta) {
   this.rBush_.forEachInExtent(geometry.getExtent(), function(segmentDataMatch) {
-    goog.asserts.assert(goog.isDef(segmentDataMatch.depth));
+    //goog.asserts.assert(goog.isDef(segmentDataMatch.depth));
     if (segmentDataMatch.geometry === geometry &&
-        (!goog.isDef(depth) ||
-        goog.array.equals(segmentDataMatch.depth, depth)) &&
+        (!goog.isDef(depth) /*||
+        goog.array.equals(segmentDataMatch.depth, depth)*/) &&
         segmentDataMatch.index > index) {
       segmentDataMatch.index += delta;
     }

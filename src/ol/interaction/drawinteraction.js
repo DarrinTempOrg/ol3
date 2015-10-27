@@ -844,6 +844,23 @@ ol.interaction.Draw.getMode_ = function(type) {
   return mode;
 };
 
+/**
+ * Get the draw overlay where sketch features are drawn.
+ * @return {ol.layer.Vector} drawing overlay 
+ * @api
+ */
+ol.interaction.Draw.prototype.getOverlay = function() {
+  return this.overlay_;
+};
+
+/**
+ * Get the Sketch Feature
+ * @return {ol.Feature} sketch feature
+ * @api
+ */
+ol.interaction.Draw.prototype.getSketchFeature = function() {
+  return this.sketchFeature_;
+};
 
 /**
  * Function that takes coordinates and an optional existing geometry as
