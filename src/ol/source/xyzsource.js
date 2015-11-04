@@ -28,10 +28,10 @@ goog.require('ol.source.TileImage');
  * @api stable
  */
 ol.source.XYZ = function(options) {
-  var projection = goog.isDef(options.projection) ?
+  var projection = options.projection !== undefined ?
       options.projection : 'EPSG:3857';
 
-  var tileGrid = goog.isDef(options.tileGrid) ? options.tileGrid :
+  var tileGrid = options.tileGrid !== undefined ? options.tileGrid :
       ol.tilegrid.createXYZ({
         extent: ol.tilegrid.extentFromProjection(projection),
         maxZoom: options.maxZoom,
@@ -53,14 +53,14 @@ ol.source.XYZ = function(options) {
     tileLoadFunction: options.tileLoadFunction,
     tilePixelRatio: options.tilePixelRatio,
     tileUrlFunction: ol.TileUrlFunction.nullTileUrlFunction,
-    wrapX: goog.isDef(options.wrapX) ? options.wrapX : true
+    wrapX: options.wrapX !== undefined ? options.wrapX : true
   });
 
-  if (goog.isDef(options.tileUrlFunction)) {
+  if (options.tileUrlFunction !== undefined) {
     this.setTileUrlFunction(options.tileUrlFunction);
-  } else if (goog.isDef(options.urls)) {
+  } else if (options.urls !== undefined) {
     this.setUrls(options.urls);
-  } else if (goog.isDef(options.url)) {
+  } else if (options.url !== undefined) {
     this.setUrl(options.url);
   }
 
@@ -87,7 +87,7 @@ ol.source.XYZ.prototype.getUrls = function() {
  */
 ol.source.XYZ.prototype.setUrl = function(url) {
   this.setTileUrlFunction(ol.TileUrlFunction.createFromTemplates(
-      ol.TileUrlFunction.expandUrl(url)));
+      ol.TileUrlFunction.expandUrl(url), this.tileGrid));
   this.urls_ = [url];
 };
 
@@ -97,6 +97,7 @@ ol.source.XYZ.prototype.setUrl = function(url) {
  * @param {Array.<string>} urls URLs.
  */
 ol.source.XYZ.prototype.setUrls = function(urls) {
-  this.setTileUrlFunction(ol.TileUrlFunction.createFromTemplates(urls));
+  this.setTileUrlFunction(
+      ol.TileUrlFunction.createFromTemplates(urls, this.tileGrid));
   this.urls_ = urls;
 };
