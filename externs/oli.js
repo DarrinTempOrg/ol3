@@ -66,7 +66,25 @@ oli.ModifyEvent.prototype.features;
  */
 oli.ModifyEvent.prototype.mapBrowserPointerEvent;
 
+/**
+ * @interface
+ */
+oli.SnapEvent = function() {};
 
+/**
+ * @type {ol.Coordinate}
+ */
+oli.SnapEvent.prototype.vertex;
+
+/**
+ * @type {ol.Pixel}
+ */
+oli.SnapEvent.prototype.vertexPixel;
+
+/**
+ * @type {ol.Feature}
+ */
+oli.SnapEvent.prototype.feature;
 
 /**
  * @interface

@@ -1,5 +1,7 @@
 goog.provide('ol.interaction.Snap');
 goog.provide('ol.interaction.SnapProperty');
+goog.provide('ol.interaction.SnapEvent');
+goog.provide('ol.interaction.SnapEventType');
 
 goog.require('goog.asserts');
 goog.require('goog.events');
@@ -13,7 +15,8 @@ goog.require('ol.Extent');
 goog.require('ol.Feature');
 goog.require('ol.Object');
 goog.require('ol.Observable');
-goog.require('ol.coordinate');
+goog.require('ol.Coordinate');
+goog.require('ol.Pixel');
 goog.require('ol.extent');
 goog.require('ol.geom.Geometry');
 goog.require('ol.interaction.Pointer');
@@ -22,7 +25,53 @@ goog.require('ol.source.VectorEvent');
 goog.require('ol.source.VectorEventType');
 goog.require('ol.structs.RBush');
 
+/**
+* @enum {string}
+*/
+ol.interaction.SnapEventType = {
+    SNAP: 'snap',
+    UNSNAP: 'unsnap'
+};
 
+/**
+* @classdesc
+* Events emitted by {@link ol.interaction.Snap} instances are instances of
+* this type.
+*
+* @constructor
+* @extends {goog.events.Event}
+* @param {ol.interaction.SnapEventType} type Type.
+* @param {ol.Coordinate} vertex The vertex coordinates
+* @param {ol.Pixel} vertexPixel The vertex pixels
+* @param {ol.Feature} feature The feature snapped to.
+* @api stable
+*/
+ol.interaction.SnapEvent = function (type, vertex, vertexPixel, feature) {
+    goog.base(this, type, feature);
+
+  /**
+   * The vertex coordinates
+   * @type {ol.Coordinate}
+   * @api stable
+   */
+    this.vertex = vertex;
+
+  /**
+   * The vertex pixels.
+   * @type {ol.Pixel}
+   * @api stable
+   */
+	this.vertexPixel = vertexPixel;
+
+  /**
+   * The feature being drawn.
+   * @type {ol.Feature}
+   * @api stable
+   */
+    this.feature = feature;
+
+};
+goog.inherits(ol.interaction.SnapEvent, goog.events.Event);
 
 /**
  * @classdesc
@@ -92,6 +141,12 @@ ol.interaction.Snap = function(opt_options) {
     this.snapToVertices_ = true;
     this.snapToEdges_ = false;
   }
+
+  /**
+   * @type {boolean}
+   * @private
+   */
+  this.wasSnapped_ = false;
 
   /**
    * @type {Array.<goog.events.Key>}
@@ -394,6 +449,7 @@ ol.interaction.Snap.prototype.snapTo = function(pixel, pixelCoordinate, map) {
   var snapped = false;
   var vertex = null;
   var vertexPixel = null;
+  var snappedFeature = null;
   if (segments.length > 0) {
     this.pixelCoordinate_ = pixelCoordinate;
     segments.sort(this.sortByDistance_);
@@ -404,7 +460,8 @@ ol.interaction.Snap.prototype.snapTo = function(pixel, pixelCoordinate, map) {
     if (Math.sqrt(ol.coordinate.squaredDistance(pixel, vertexPixel)) <=
         this.pixelTolerance_) {
       if (this.snapToEdges_ && !this.snapToEndVerticesOnly_) {
-        snapped = true;
+          snapped = true;
+          snappedFeature = segments[0].feature;
       }
       if (this.snapToVertices_) {
         var pixel1 = map.getPixelFromCoordinate(closestSegment[0]);
@@ -423,6 +480,7 @@ ol.interaction.Snap.prototype.snapTo = function(pixel, pixelCoordinate, map) {
           if (this.snapToEndVerticesOnly_) {
             snapped = false;
             var geometry = segments[0].feature.getGeometry();
+            snappedFeature = segments[0].feature;
             var geometryType = geometry.getType();
             if (geometryType == 'LineString') {
               var simpleGeometry =
@@ -436,11 +494,30 @@ ol.interaction.Snap.prototype.snapTo = function(pixel, pixelCoordinate, map) {
                   vertex[1] == lastCoordinate[1])) {
                 snapped = true;
               }
+            } else if (geometryType == 'Point') {
+			  var simpleGeometry =
+                /** @type {ol.geom.SimpleGeometry} */ (geometry);
+              var ptCoordinates = simpleGeometry.getCoordinates();
+              if ((vertex[0] == ptCoordinates[0] &&
+                vertex[1] == ptCoordinates[1])) {
+                  snapped = true;
+              }
             }
           }
         }
       }
     }
+  }
+  if (snapped) {
+      this.wasSnapped_ = true;
+      this.dispatchEvent(new ol.interaction.SnapEvent(
+          ol.interaction.SnapEventType.SNAP, vertex, vertexPixel, snappedFeature));
+  }
+  else {
+      if (this.wasSnapped_) {
+          this.dispatchEvent(new ol.interaction.SnapEvent(ol.interaction.SnapEventType.UNSNAP, vertex, vertexPixel, snappedFeature));
+      }
+      this.wasSnapped_ = false;
   }
   return /** @type {ol.interaction.Snap.ResultType} */ ({
     snapped: snapped,
