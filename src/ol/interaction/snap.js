@@ -34,7 +34,8 @@ ol.interaction.SnapEventType = {
 * this type.
 *
 * @constructor
-* @extends {goog.events.Event}
+* @extends {ol.events.Event}
+* @implements {oli.interaction.SnapEvent}
 * @param {ol.interaction.SnapEventType} type Type.
 * @param {ol.Coordinate} vertex The vertex coordinates
 * @param {ol.Pixel} vertexPixel The vertex pixels
@@ -42,9 +43,17 @@ ol.interaction.SnapEventType = {
 * @api stable
 */
 ol.interaction.SnapEvent = function (type, vertex, vertexPixel, feature) {
-   // Commented out because after upgrade to OL 3.2 this was causing: Uncaught Error: goog.base called from a method of one name to a method of a different name
-   //goog.base(this, type, feature);
 
+  ol.events.Event.call(this, type);
+	
+  /**
+   * The feature snapped to.
+   * @type {ol.Feature}
+   * @api stable
+   */
+    this.snappedFeature = feature;
+	
+	
   /**
    * The vertex coordinates
    * @type {ol.Coordinate}
@@ -67,7 +76,7 @@ ol.interaction.SnapEvent = function (type, vertex, vertexPixel, feature) {
     this.feature = feature;
 
 };
-goog.inherits(ol.interaction.SnapEvent, goog.events.Event);
+ol.inherits(ol.interaction.SnapEvent, ol.events.Event);
 //===========================================================
 
 /**
@@ -474,9 +483,13 @@ ol.interaction.Snap.prototype.snapTo = function(pixel, pixelCoordinate, map) {
     }
     //==================================================================
     // BENTLEY CUSTOMIZATION 
+		/**
+		 * The message hex ID.
+		 * @type {ol.Feature}
+	  */
     var snappedFeature;
     if (goog.isDef(segments) && segments.length > 0) {
-      snappedFeature = segments[0];
+      snappedFeature = /** @type {ol.Feature} */ (segments[0]);
     }
     if (snapped) {
       vertexPixel = [Math.round(vertexPixel[0]), Math.round(vertexPixel[1])];
@@ -500,7 +513,7 @@ ol.interaction.Snap.prototype.snapTo = function(pixel, pixelCoordinate, map) {
 };
 //==================================================================
 // BENTLEY CUSTOMIZATION 
-ol.interaction.Snap.prototype.snappedToVertexCustom = function(that, vertexPixel, segments, snapped, vertex) {
+ ol.interaction.Snap.prototype.snappedToVertexCustom = function(that, vertexPixel, segments, snapped, vertex) {
   if (that.snapToEndVerticesOnly_) {
     snapped = false;
     var geometry = segments[0].feature.getGeometry();
