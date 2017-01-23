@@ -1,13 +1,6 @@
 goog.provide('ol.RotationConstraint');
-goog.provide('ol.RotationConstraintType');
 
-goog.require('goog.math');
-
-
-/**
- * @typedef {function((number|undefined), number): (number|undefined)}
- */
-ol.RotationConstraintType;
+goog.require('ol.math');
 
 
 /**
@@ -66,7 +59,7 @@ ol.RotationConstraint.createSnapToN = function(n) {
  * @return {ol.RotationConstraintType} Rotation constraint.
  */
 ol.RotationConstraint.createSnapToZero = function(opt_tolerance) {
-  var tolerance = opt_tolerance || goog.math.toRadians(5);
+  var tolerance = opt_tolerance || ol.math.toRadians(5);
   return (
       /**
        * @param {number|undefined} rotation Rotation.
