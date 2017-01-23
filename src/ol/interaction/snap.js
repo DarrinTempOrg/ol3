@@ -137,10 +137,10 @@ ol.interaction.Snap = function(opt_options) {
    */
   this.snapToEndVerticesOnly_ = goog.isDef(options.snapToEndVerticesOnly) ?
       options.snapToEndVerticesOnly : false;
-  if (this.snapToEndVerticesOnly_) {
-    this.snapToVertices_ = true;
-    this.snapToEdges_ = false;
-  }
+	if (this.snapToEndVerticesOnly_) {
+      this.vertex_ = true;
+      this.edge_ = false;
+	}
 
   /**
    * @type {boolean}
